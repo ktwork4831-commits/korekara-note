@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f6f2e9" />
+  <title>これからノート</title>
+  <style>
+    :root{--bg:#f6f2e9;--card:#fffdf8;--ink:#26332c;--muted:#6c766f;--line:#ddd8cd;--accent:#48705b;--accent2:#e5eee8;--danger:#a64b43;--shadow:0 12px 34px rgba(41,54,46,.08)}
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:linear-gradient(180deg,#f4efe5 0,#f8f6f1 100%);color:var(--ink)}
+    button,input,textarea,select{font:inherit} button{cursor:pointer}
+    .wrap{width:min(780px,calc(100% - 28px));margin:0 auto;padding:28px 0 64px}
+    header{padding:18px 4px 10px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--accent);text-transform:uppercase}h1{margin:7px 0 5px;font-size:clamp(30px,7vw,46px);line-height:1.1}header p{margin:0;color:var(--muted);line-height:1.8}
+    .notice{margin:18px 0;background:var(--accent2);border:1px solid #cadccf;border-radius:16px;padding:14px 16px;font-size:13px;line-height:1.7}
+    .toolbar{position:sticky;top:0;z-index:5;display:flex;gap:8px;flex-wrap:wrap;padding:12px 0;background:rgba(246,242,233,.92);backdrop-filter:blur(10px)}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 15px;color:var(--ink);font-weight:700}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.danger{color:var(--danger)}
+    .save-state{margin-left:auto;align-self:center;font-size:12px;color:var(--muted)}
+    section{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:20px;margin:14px 0;box-shadow:var(--shadow)}
+    .section-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:16px}.section-head h2{margin:0;font-size:20px}.section-head p{margin:5px 0 0;color:var(--muted);font-size:13px}.share-toggle{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--muted);white-space:nowrap}
+    .switch{position:relative;width:42px;height:24px}.switch input{opacity:0;width:0;height:0}.slider{position:absolute;inset:0;border-radius:999px;background:#c7ccc8;transition:.2s}.slider:before{content:"";position:absolute;width:18px;height:18px;left:3px;top:3px;border-radius:50%;background:white;transition:.2s;box-shadow:0 2px 5px rgba(0,0,0,.18)}.switch input:checked+.slider{background:var(--accent)}.switch input:checked+.slider:before{transform:translateX(18px)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:flex;flex-direction:column;gap:7px}.field.full{grid-column:1/-1}.field label{font-size:13px;font-weight:700}.field input,.field textarea,.field select{width:100%;border:1px solid var(--line);border-radius:13px;background:#fff;padding:12px 13px;color:var(--ink);outline:none}.field textarea{min-height:84px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(72,112,91,.12)}
+    .field-share{display:flex;justify-content:space-between;align-items:center;gap:10px}.tiny{font-size:11px;color:var(--muted);font-weight:500}.footer-note{font-size:12px;line-height:1.7;color:var(--muted);padding:8px 4px}
+    dialog{border:0;border-radius:20px;padding:0;width:min(620px,calc(100% - 28px));box-shadow:0 30px 90px rgba(0,0,0,.25)}dialog::backdrop{background:rgba(20,26,22,.45)}.modal{padding:22px}.modal h3{margin:0 0 12px}.preview{white-space:pre-wrap;background:#f6f5f1;border:1px solid var(--line);border-radius:14px;padding:14px;max-height:52vh;overflow:auto;line-height:1.7;font-size:14px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;flex-wrap:wrap}
+    @media(max-width:620px){.wrap{width:min(100% - 18px,780px);padding-top:14px}.grid{grid-template-columns:1fr}.field.full{grid-column:auto}section{padding:17px;border-radius:18px}.section-head{flex-direction:column}.share-toggle{align-self:flex-end}.save-state{width:100%;margin-left:2px}.toolbar{top:0}}
+  </style>
+</head>
+<body>
+<main class="wrap">
+  <header><div class="eyebrow">これからを安心して楽しむために</div><h1>これからノート</h1><p>大切な情報を、必要な分だけ。入力内容はこの端末のブラウザ内に保存されます。</p></header>
+  <div class="notice"><strong>安全のため：</strong>暗証番号やパスワードそのものは入力せず、「保管場所」だけを記録してください。共有前には内容を必ず確認してください。</div>
+  <div class="toolbar">
+    <button class="btn primary" id="shareBtn">共有内容を確認</button>
+    <button class="btn" id="csvBtn">CSVダウンロード</button>
+    <button class="btn danger" id="resetBtn">すべて消去</button>
+    <span class="save-state" id="saveState">保存済み</span>
+  </div>
+  <form id="noteForm" autocomplete="off"></form>
+  <p class="footer-note">このノートは希望や情報を整理するためのものです。相続方法を法的に指定する場合は、正式な遺言書が必要です。</p>
+</main>
+<dialog id="shareDialog"><div class="modal"><h3>共有する内容</h3><div class="preview" id="sharePreview"></div><div class="modal-actions"><button class="btn" id="closeDialog">閉じる</button><button class="btn" id="copyBtn">コピー</button><button class="btn primary" id="nativeShareBtn">共有する</button></div></div></dialog>
+<script>
+const sections=[
+ {id:'contact',title:'最初に連絡する人',desc:'もしものとき、最初に知らせてほしい人',fields:[['contactName','氏名','text'],['relation','続柄','text'],['phone','電話番号','tel']]},
+ {id:'medical',title:'医療について',desc:'治療や判断に必要な最低限の情報',fields:[['conditions','持病・服用中の薬','textarea'],['allergies','アレルギー','textarea'],['lifeSupport','延命治療の希望','select',['未選択','希望する','希望しない','家族・医師の判断に任せる','その他']],['decisionMaker','判断を任せたい人','text']]},
+ {id:'assets',title:'財産・保険・借入れ',desc:'金額ではなく、存在と確認先を中心に',fields:[['banks','利用している銀行','textarea'],['securities','証券会社','textarea'],['insurance','保険会社','textarea'],['debts','借金・ローン','textarea'],['documents','重要書類の保管場所','textarea']]},
+ {id:'digital',title:'スマートフォン・葬儀',desc:'解約や手続きで家族が困らないために',fields:[['passwordLocation','スマホやパスワード情報の保管場所','textarea'],['subscriptions','解約が必要なサービス','textarea'],['funeral','葬儀の希望','textarea'],['grave','お墓の場所','textarea'],['writtenDate','記入日','date']]}
+];
+const STORAGE='korekara-note-v1';
+let state=JSON.parse(localStorage.getItem(STORAGE)||'{}');
+const form=document.getElementById('noteForm');
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function render(){form.innerHTML=sections.map(sec=>`<section><div class="section-head"><div><h2>${sec.title}</h2><p>${sec.desc}</p></div><label class="share-toggle">この項目を共有 <span class="switch"><input type="checkbox" data-section-share="${sec.id}" ${state['_section_'+sec.id]!==false?'checked':''}><span class="slider"></span></span></label></div><div class="grid">${sec.fields.map(f=>{const [id,label,type,opts]=f;const value=state[id]||'';const control=type==='textarea'?`<textarea id="${id}" data-key="${id}">${esc(value)}</textarea>`:type==='select'?`<select id="${id}" data-key="${id}">${opts.map(o=>`<option ${value===o?'selected':''}>${o}</option>`).join('')}</select>`:`<input id="${id}" data-key="${id}" type="${type}" value="${esc(value)}">`;return `<div class="field ${type==='textarea'?'full':''}"><div class="field-share"><label for="${id}">${label}</label><label class="tiny"><input type="checkbox" data-field-share="${id}" ${state['_share_'+id]!==false?'checked':''}> 共有</label></div>${control}</div>`}).join('')}</div></section>`).join('')}
+render();
+let timer;
+form.addEventListener('input',e=>{if(e.target.dataset.key)state[e.target.dataset.key]=e.target.value;if(e.target.dataset.fieldShare)state['_share_'+e.target.dataset.fieldShare]=e.target.checked;if(e.target.dataset.sectionShare)state['_section_'+e.target.dataset.sectionShare]=e.target.checked;document.getElementById('saveState').textContent='保存中…';clearTimeout(timer);timer=setTimeout(()=>{localStorage.setItem(STORAGE,JSON.stringify(state));document.getElementById('saveState').textContent='保存済み'},250)});
+function selectedRows(){const rows=[];sections.forEach(sec=>{if(state['_section_'+sec.id]===false)return;const items=[];sec.fields.forEach(([id,label])=>{if(state['_share_'+id]===false)return;const value=(state[id]||'').trim();if(value)items.push([label,value])});if(items.length)rows.push([sec.title,items])});return rows}
+function shareText(){const rows=selectedRows();if(!rows.length)return '共有する内容が入力されていません。';return ['【これからノート】',...rows.flatMap(([title,items])=>['',`■ ${title}`,...items.map(([l,v])=>`${l}：${v}`)])].join('\n')}
+const dialog=document.getElementById('shareDialog');document.getElementById('shareBtn').onclick=()=>{document.getElementById('sharePreview').textContent=shareText();dialog.showModal()};document.getElementById('closeDialog').onclick=()=>dialog.close();document.getElementById('copyBtn').onclick=async()=>{await navigator.clipboard.writeText(shareText());document.getElementById('copyBtn').textContent='コピーしました';setTimeout(()=>document.getElementById('copyBtn').textContent='コピー',1300)};document.getElementById('nativeShareBtn').onclick=async()=>{const text=shareText();if(navigator.share)await navigator.share({title:'これからノート',text});else{await navigator.clipboard.writeText(text);alert('共有機能が利用できないため、コピーしました。')}};
+function csvEscape(v){return '"'+String(v).replace(/"/g,'""')+'"'}
+document.getElementById('csvBtn').onclick=()=>{const rows=[['分類','項目','内容']];selectedRows().forEach(([title,items])=>items.forEach(([l,v])=>rows.push([title,l,v])));const csv='\uFEFF'+rows.map(r=>r.map(csvEscape).join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`これからノート_${new Date().toISOString().slice(0,10)}.csv`;a.click();URL.revokeObjectURL(a.href)};
+document.getElementById('resetBtn').onclick=()=>{if(confirm('入力内容と共有設定をすべて消去しますか？')){localStorage.removeItem(STORAGE);state={};render();document.getElementById('saveState').textContent='消去しました'}};
+</script>
+</body></html>
