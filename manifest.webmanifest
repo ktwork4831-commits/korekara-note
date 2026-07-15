@@ -1,11 +1,11 @@
 {
-  "name": "これからノート",
-  "short_name": "これからノート",
+  "name": "未来に残すノート",
+  "short_name": "未来ノート",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#07111f",
-  "theme_color": "#07111f",
-  "description": "大切な情報を整理し、LINEやメールで共有できるノート",
+  "background_color": "#eef7ef",
+  "theme_color": "#eef7ef",
+  "description": "大切な情報を整理し、完成した内容を家族へ共有できるノート",
   "icons": [
     {
       "src": "icon.svg",
